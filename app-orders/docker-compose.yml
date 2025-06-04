@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  # app:
+  #   container_name: orders-service
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3333:3333'
+  #   depends_on:
+  #     - orders-database
+
+  orders-database:
+    container_name: orders-database
+    image: bitnami/postgresql:latest
+    ports:
+      - '5482:5432'
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=orders
+    volumes:
+      - ./docker:/docker-entrypoint-initdb.d
