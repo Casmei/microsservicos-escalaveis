@@ -1,5 +1,7 @@
+import "@opentelemetry/auto-instrumentations-node/register"
+import { trace } from "@opentelemetry/api"
 import { fastify } from "fastify";
-
+import { setTimeout } from "node:timers/promises";
 import {
 	serializerCompiler,
 	validatorCompiler,
@@ -10,6 +12,7 @@ import { db } from "../database/client.ts";
 import { schema } from "../database/schema/index.ts";
 import { randomUUID } from "node:crypto";
 import { dispatchOrderCreated } from "../broker/messages/order-created.ts";
+import { tracer } from "../tracer/tracer.ts";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 app.setSerializerCompiler(serializerCompiler);
@@ -45,6 +48,14 @@ app.post(
 			customerId: "a4945622-7907-4db9-b607-31cebcf8c167",
 			amount
 		})
+
+		const span = tracer.startSpan('Eu acho que aqui tá dando merda')
+		span.setAttribute('test', 'Olá mundo');
+
+		await setTimeout(2000)
+		span.end()
+		trace.getActiveSpan()?.setAttribute('order_id', orderId)
+
 		return reply.status(201).send();
 	},
 );
